@@ -12,20 +12,7 @@ pipeline {
                 checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Bhargavi-lakamsani/docker-spring-boot.git']])
             }
         }
-        
-        stage('Build') {
-            steps {
-                sh './mvnw clean package'
-            }
-        }
-
-        stage('List Files') {
-            steps {
-                sh 'ls -la target/'
-            }
-        }
-
-        stage('Build Image') {
+         stage('Build Image') {
             steps {
                 script {
                     sh "docker build -t ${registry}:${BUILD_NUMBER} ."
