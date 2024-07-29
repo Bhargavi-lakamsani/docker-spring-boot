@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM maven:3.8.4-openjdk-8 AS build
+FROM maven:3.8.4-openjdk-11 AS build
 
 # Set the working directory
 WORKDIR /app
@@ -14,7 +14,7 @@ WORKDIR /app/docker-spring-boot
 RUN mvn clean package
 
 # Stage 2: Run
-FROM openjdk:8-jre-alpine
+FROM openjdk:11-jre-alpine
 
 # Set the working directory
 WORKDIR /app
