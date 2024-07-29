@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         registry = "590183706325.dkr.ecr.ap-south-1.amazonaws.com/docker"
+        imageName = "my-image"
     }
 
     stages {
@@ -11,7 +12,19 @@ pipeline {
                 checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Bhargavi-lakamsani/docker-spring-boot.git']])
             }
         }
-    
+        
+        stage('Build') {
+            steps {
+                sh './mvnw clean package'
+            }
+        }
+
+        stage('List Files') {
+            steps {
+                sh 'ls -la target/'
+            }
+        }
+
         stage('Build Image') {
             steps {
                 script {
@@ -23,8 +36,8 @@ pipeline {
         stage('Push to ECR') {
             steps {
                 script {
-                    sh "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 590183706325.dkr.ecr.ap-south-1.amazonaws.com"
-                    sh "docker push 590183706325.dkr.ecr.ap-south-1.amazonaws.com/docker:$BUILD_NUMBER"
+                    sh "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${registry}"
+                    sh "docker push ${registry}:${BUILD_NUMBER}"
                 }
             }
         }
@@ -38,7 +51,7 @@ pipeline {
         stage('Helm Deploy') {
             steps {
                 script {
-                    sh "helm upgrade first --install mychart --namespace helm-deployment --set image.tag=$BUILD_NUMBER"
+                    sh "helm upgrade first --install mychart --namespace helm-deployment --set image.tag=${BUILD_NUMBER}"
                 }
             }
         }
