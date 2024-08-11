@@ -3,44 +3,48 @@ pipeline {
 
     environment {
         registry = "590183706325.dkr.ecr.ap-south-1.amazonaws.com/docker-repo"
-        imageName = "my-image"
     }
-
     stages {
         stage('Checkout') {
             steps {
-                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Bhargavi-lakamsani/docker-spring-boot.git']])
+                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/akannan1087/docker-spring-boot']])
             }
         }
-         stage('Build Image') {
+        
+        stage ("Build JAR") {
+            steps {
+                sh "mvn clean install"
+            }
+        }
+        
+        stage ("Build Image") {
             steps {
                 script {
-                    sh "docker build -t ${registry}:${BUILD_NUMBER} ."
+                    docker.build registry
                 }
             }
         }
         
-        stage('Push to ECR') {
+        stage ("Push to ECR") {
             steps {
                 script {
-                    sh "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${registry}"
-                    sh "docker push ${registry}:${BUILD_NUMBER}"
+                    sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 211223789150.dkr.ecr.us-east-1.amazonaws.com"
+                    sh "docker push 590183706325.dkr.ecr.ap-south-1.amazonaws.com/docker-repo:latest"
+                    
                 }
             }
         }
         
-        stage('Helm package') {
+        stage ("Helm package") {
             steps {
-                sh "helm package springboot"
-            }
-        }
-        
-        stage('Helm Deploy') {
-            steps {
-                script {
-                    sh "helm upgrade first --install mychart --namespace helm-deployment --set image.tag=${BUILD_NUMBER}"
+                    sh "helm package springboot"
                 }
             }
-        }
+                
+        stage ("Helm install") {
+            steps {
+                    sh "helm upgrade myrelease-21 springboot-0.1.0.tgz"
+                }
+            }
     }
 }
