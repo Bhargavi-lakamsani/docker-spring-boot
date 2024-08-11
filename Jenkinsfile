@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        registry = "590183706325.dkr.ecr.ap-south-1.amazonaws.com/docker"
+        registry = "590183706325.dkr.ecr.ap-south-1.amazonaws.com/docker-repo"
         imageName = "my-image"
     }
 
