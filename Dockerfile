@@ -9,7 +9,7 @@ COPY pom.xml .
 COPY src ./src
 
 # Package the application
-RUN mvn clean package -DskipTests
+RUN mvn clean package
 
 # Stage 2: Run Stage
 FROM openjdk:11-jre-slim
