@@ -4,9 +4,7 @@ FROM maven:3.8.5-openjdk-11 AS build
 # Set the working directory
 WORKDIR /app
 
-# Copy the Maven project files
-COPY pom.xml .
-COPY src ./src
+RUN git clone https://github.com/akannan1087/docker-spring-boot.git
 
 # Package the application
 RUN mvn clean package
