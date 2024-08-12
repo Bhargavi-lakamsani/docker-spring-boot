@@ -6,6 +6,7 @@ pipeline {
         imageName = "spring-helm"
         awsCredentialsId = "aws-ecr-credentials"
         region = "ap-south-1"  // Set the AWS region
+        namespace = "dev"      // Define the namespace
     }
 
     stages {
@@ -38,9 +39,18 @@ pipeline {
         stage('Deploy with Helm') {
             steps {
                 script {
-                    sh "helm upgrade --install ./mychart --namespace ${namespace} --set image.repository=${registry} --set image.tag=${BUILD_NUMBER}"
+                    sh "helm upgrade --install ${imageName} ./mychart --namespace ${namespace} --set image.repository=${registry} --set image.tag=${BUILD_NUMBER}"
                 }
             }
+        }
+    }
+
+    post {
+        failure {
+            echo 'Pipeline failed. Please check the logs for more details.'
+        }
+        success {
+            echo 'Pipeline succeeded.'
         }
     }
 }
